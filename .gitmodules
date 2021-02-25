@@ -1,0 +1,6 @@
+[submodule "tools/asl"]
+	path = tools/asl
+	url = https://lamenet.net:60000/winston/asl.git
+[submodule "tools/lcc1802"]
+	path = tools/lcc1802
+	url = https://lamenet.net:60000/winston/lcc1802.git
