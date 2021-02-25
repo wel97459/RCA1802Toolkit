@@ -1,49 +1,65 @@
 /*
     terminal example by Marcel van Tongoren 
 */
-#define __VIP__
 
-//#include <stdint.h>
-//#include <nstdlib.h>
+#include <stdint.h>
+#include <nstdlib.h>
+#include <cosmacelf.h>
 
-//#include "devkit/video/pixie_video.h"
+#include "devkit/video/pixie_video.h"
 
 
-#define X_SIZE 16
-#define Y_SIZE 8
+#define X_SIZE 64
+#define Y_SIZE 32
 
- #define test 0
+static const uint8_t shape_o[] =
+{
+	0x04,
+	0x80, 0x00, 0x00, 0x00
+};
 
- #if test == 1
-    void testing()
-	{
-		int i = 1;
-		return;
-	}
-#endif
+typedef struct
+{
+  volatile unsigned char vram[256];
+} Vram_Pointer;
 
-// static const uint8_t shape_o[] =
-// {
-// 	0x66, 0x99, 0x99, 0x66, 0x66, 0x99, 0x99, 0x66, 0x66, 0x99, 0x99, 0x66, 0x66, 0x99, 0x99, 0x66
-// };
+#define VRAM  ((Vram_Pointer*)(0x0F00))
 
-// static const uint8_t shape_space[] =
-// {
-// 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-// };
+uint8_t x, y, xd=1, yd=1, delay;
+
+void checkX(){
+		if(x < 2)
+		xd=1;
+		if(x > X_SIZE-5)
+		xd=255;
+}
+
+void checkY(){
+		if(y < 4)
+		yd=1;
+		if(y > Y_SIZE-5)
+		yd=255;	
+}
 
 void main(){
-	int x, y, delay;
-    unsigned char key;
+	
+	initvideo();
 
-//	initvideo();
+	for (x = 0; x < 208; x++)
+	{
+	 	VRAM->vram[x] = cosmacelfbytes[x];
+	}
 
 	x = (int) (X_SIZE/2);
     y = (int) (Y_SIZE/2);                   // Set x and y to middle of screen
 
-//	drawtile (x, y, shape_o);
-
+	drawsprite(x, y, shape_o);
 	while (1) {
-//		drawtile (x, y, shape_o);
+		checkX();
+		checkY();			
+		drawsprite(x, y, shape_o);
+		 	x+=xd;
+			y+=yd;
+		//drawsprite(x, y, shape_o);
 	}
 }
