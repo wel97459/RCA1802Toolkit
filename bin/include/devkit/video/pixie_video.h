@@ -13,7 +13,7 @@
 		#define X_SIZE 64
 		#define Y_SIZE RES
 		void flags_pixie_sprite_includer(){
-			asm("PIXIE_SPRITE: equ 1\n");
+			asm("PIXIE_SPRITE equ 1\n");
 		}
 		void drawsprite(uint8_t x, uint8_t y, const uint8_t * spritedata);
 	#endif
@@ -22,7 +22,7 @@
 		#define X_SIZE 16
 		#define Y_SIZE 8
 		void flags_pixie_tile_includer(){
-			asm("PIXIE_TILE: equ 1\n");
+			asm("PIXIE_TILE equ 1\n");
 		}
 		void drawtile(uint8_t x, uint8_t y, const uint8_t * spritedata);
 	#endif
@@ -30,11 +30,11 @@
 	#define str(s) #s
 	#define xstr(s) str(s)
 
-	#define VMEM  "VIDMEM: equ " xstr(VIDMEM) "\n"
+	#define VMEM  "VIDMEM equ " xstr(VIDMEM) "\n"
 
 	void pixie_video_includer(){
 		asm(VMEM);
-		asm("include devkit/video/pixie_video.inc\n");
+		asm(" include devkit/video/pixie_video.inc\n");
 	}
 
 #endif // _PIXIE_VIDEO_H
