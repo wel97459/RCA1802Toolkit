@@ -5,7 +5,7 @@
 void disableinterrupt();
 void enableinterrupt();
 void system_includer(){
-asm(" include devkit/system/system.inc\n");
+asm("include devkit/system/system.inc\n");
 }
 
 #endif // _SYSTEM_H
