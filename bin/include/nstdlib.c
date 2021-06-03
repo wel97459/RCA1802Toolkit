@@ -45,7 +45,6 @@ unsigned int strlen(char *str)
 void printstr(char *ptr){
     while(*ptr){
 		putc(*ptr++); //jan 29
-		asm(" nop1806\n nop1806\n nop1806\n"); //17-03-09
 	}
 }
 #ifndef nofloats
@@ -153,14 +152,39 @@ char * ltoa(long s, char *buffer){ //convert a long integer to printable ascii i
 	strcpy(bptr,dubdabx(s,bptr,1)); //uses assembler double-dabble routine
 	return buffer;
 }
-void printint(int s){ //print an integer
+
+char * zeroPad(unsigned char nZreos, char *buffer){
+	char *bpr=buffer; 
+	char *bpw=buffer;
+    int l = strlen(buffer);
+    
+    if(nZreos == 0 || nZreos <= l) return buffer;
+
+    bpr += l;
+    bpw += nZreos;
+
+    while (bpw >= buffer)
+    {
+        *bpw = (l >= 0) ? *bpr : '0';
+
+        bpr--;
+        bpw--;
+        l--;
+    }
+	return buffer;
+}
+
+void printint(int s, unsigned char nZreos){ //print an integer
 	char buffer[8];
 	itoa(s,buffer);
+	zeroPad(nZreos, buffer);
 	printstr(buffer);
 }
-void printlint(long s){ //print a long integer
+void printlint(long s, unsigned char nZreos){ //print a long integer
 	char buffer[12];
-	printstr(ltoa(s,buffer));
+	ltoa(s, buffer);
+	zeroPad(nZreos, buffer);
+	printstr(buffer);
 }
 #ifndef nofloats
 void printflt(float s){ //print a float
@@ -181,7 +205,7 @@ void putx(unsigned char x){ //print a unsigned char as ascii hex
 }
 void printf(char *pptr,...){ //limited implementation of printf
 //								supports only c,d,s,x,l formats without width or other qualifiers
-	unsigned char c,xord;
+	unsigned char c,xord,zeros;
 	register char* ptr=pptr; //try to save on loads/spills
 	int argslot=0;	//used to align longs
 	int * this=(int *)&pptr;
@@ -190,12 +214,16 @@ void printf(char *pptr,...){ //limited implementation of printf
 		c=*ptr; ptr++;
 		if (c!='%'){
 			putc(c);
-			asm(" nop1806\n nop1806\n nop1806\n"); //17-03-13
 		} else{
+			zeros = 0;
 			c=*ptr;ptr++;
+			if(c >= '0' && c <= '9'){
+				zeros = c & 0x0f;
+				c=*ptr;ptr++;
+			}
 			switch (c){
 				case 'i': case 'd':
-					printint(*this++);
+					printint(*this++, zeros);
 					argslot+=1; //next argument slot
 					break;
 				case 's':
@@ -224,7 +252,7 @@ void printf(char *pptr,...){ //limited implementation of printf
 							argslot++;
 						}
 						if(xord=='d'){
-							printlint(*(long *)this);//treats "this" as a pointer to long
+							printlint(*(long *)this, zeros);//treats "this" as a pointer to long
 							this+=2;				// and advances it 4 bytes
 						} else{
 							putx(((unsigned int) *this)>>8);

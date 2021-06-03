@@ -3,7 +3,6 @@
 ;18-02-23 changed label + to $$no0 in _inp: to eliminate this style of temporary
 	align 64
 ;;function_start IO1802.inc void function(void)
-_putc:
 _out5:	
 	glo	regArg1
 	dec	sp
