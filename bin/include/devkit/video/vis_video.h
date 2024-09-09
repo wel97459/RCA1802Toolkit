@@ -6,6 +6,7 @@
 #include "devkit/system/flags.h"
 #include "devkit/video/vis.h"
 
+
 uint8_t vis_text_color;
 uint8_t vis_text_color_mask;
 uint32_t vis_buffer;
@@ -43,7 +44,7 @@ void monochrome(uint8_t mono);
 #endif
 
 void vis_video_includer(){
-asm(" include devkit/video/vis_video.inc\n");
+    asm(" include devkit/video/vis_video.inc\n");
 }
 
 #endif // _VIS_VIDEO_H

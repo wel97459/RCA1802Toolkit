@@ -86,7 +86,7 @@ _setvideobase:          ; set video base to 'vidmem', vidmem pointer is R12
     out_vis R12, 7
     c_return
 
-    align    64
+    align    16
 _vidcharxy:             ; write 'text' to position x, y
     ldi 0
     stxd
@@ -166,7 +166,24 @@ $$loop40:
     phi R12             ; R12 = vidmem = y + x * 40
   ENDIF
     ld2 R13,'O',sp,(7)  ; move text pointer to R13
+  align    64
 _vidchar:               ; write 'character' to 'vidmem' location in video memory
+  IFNDEF TMC600 
+    ldireg R8, _vis_text_color_mask
+    ldireg R9, _vis_text_color
+    glo R13
+    smi 0x21
+    bnf +
+    smi 0x5a
+    bdf +        ; if character is between 0x21 and 0x7a adapt color
+    glo R13
+    sex R8
+    and
+    sex R9
+    add
+    plo R13
+  ENDIF
++
     ldireg r14, _vis_buffer
     select_vis_sex2
     ldn R14
@@ -200,7 +217,6 @@ $$flushbuffer:
     wait_display
     str r15
     glo r13
-    wait_display
     str R12             ; move the byte
     cretn
 
@@ -354,6 +370,7 @@ _vidclr:                ; clear screen by writing 0's to video memory
     bz $$cpy
     phi r15
     ldi 0
+    wait_display
     str r14
     inc r14
     lda r14
@@ -387,15 +404,23 @@ _shapechar:             ; shape 'number' of charcters from 'shapelocation'
     select_vis   
     ldn  R10                      
     ori  1
-    plo  R10                        
+    plo  R11                        
     ldi  0                    
-    phi  R10                        
-    sex R10
-    out 5                ; set cmem acccess
+    phi  R11                        
     sex R9
     out 6                ; VIS R6 = 0xFFFF
-    dec r9
+    dec R9
+    sex R11
+    out 5                ; set cmem acccess
     sex R2
+    ldi (_vis_out3)&255
+    plo R10
+    ldn  R10
+    xri 0x10
+    str R2
+    out 3
+    dec R2
+    wait_display
 $$nextshape:
     ldi 0
     plo R8
@@ -445,7 +470,7 @@ $$nextline:
     ghi R15
     lbz $$dontusecolor
     ani 0xc0
-    str 2    
+    str R2    
     lda R12
   IFDEF COMX
     ani 0x3f
@@ -470,11 +495,17 @@ $$shape:
     dec r15
     glo r15
     lbnz $$nextshape
-    dec R10
-    glo R10
-    ani 0xfe
-    plo R10
-    sex R10
+    
+    dec R11
+    glo R11
+    xri 1
+    plo R11
+
+    ldn  R10
+    str R2
+    out 3
+    dec R2
+    sex R11
     out 5
     sex R2
     cretn

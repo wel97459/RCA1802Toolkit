@@ -21,7 +21,7 @@ _vis_out3              equ 0x41c0
 _vis_out5_value        equ 0x80
 _vis_out5              equ 0x41c3
 _vis_space             equ 0x20
-_vis_char_lines        equ 9
+_vis_char_lines        equ 8
 _vis_top_left_corner   equ 0xf800
 _vis_bot_right_corner  equ 0xfbc0   ; actually bot_right_corner +1
 _vis_char_on_screen    equ 0x3c0
@@ -162,19 +162,38 @@ select_vis_sex2 macro
 
 wait_display macro
   IFDEF CIDELSA
-  IFDEF DRACO
-    b1 $
-  ENDIF
-  IFDEF ALTAIR
-    bn1 $
-  ENDIF
-  IFDEF DESTROYER
-    bn1 $
-  ENDIF
+    IFDEF DRACO
+      b1 $
+    ENDIF
+    IFDEF ALTAIR
+      bn1 $
+    ENDIF
+    IFDEF DESTROYER
+      bn1 $
+    ENDIF
   ELSE
     b1 $			; wait til video is quiet
   ENDIF
   endm
+
+wait_display_cmem   macro   regX
+    bn1 $$keepGoing
+    sex R10
+    dec R10
+    glo R10
+    ani 0xfe
+    plo R10
+    out 5
+    dec R10
+    b1 $; wait til video is quiet
+    glo R10
+    ori 1
+    plo R10
+    out 5
+    sex regX
+$$keepGoing:
+  endm
+
 
 out_vis:    macro    reg, output
   IFDEF TMC600 

@@ -12,6 +12,7 @@ unsigned int strlen(char *str);
 char * strcpy(char *, const char*);
 void printstr(char*);
 void putc(char);
+void putx(unsigned char x);
 char * itoa(int, char *);
 char * ltoa(long, char *);
 

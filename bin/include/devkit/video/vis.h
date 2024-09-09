@@ -46,7 +46,7 @@ uint16_t vis_column_counter;
 #endif
 
 void vis_includer(){
-asm(" include devkit/video/vis.inc\n");
+    asm(" include devkit/video/vis.inc\n");
 }
 
 #endif // _VIS_H
